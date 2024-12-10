@@ -234,7 +234,6 @@ class Game:
                 jind += 1
 
     def draw_squares(self):
-
         x = round(w_width / 2) - round((5 * s_width + 4 * s_space) / 2)
         y = 20
 
@@ -260,7 +259,6 @@ class Game:
                     y += s_height + s_space
 
     def draw_buttons(self):
-
         for i in range(len(self.btns)):
             color = GRAY
             if i < b_letters:
@@ -279,11 +277,12 @@ class Game:
         win.blit(text, (round(w_width / 2) - round(text.get_width() / 2), 370))
 
     def redraw_window(self):
-        # Função que desenha a janela a cada frame
+        # Método que desenha a janela a cada frame
         win.fill(BLACK)
         self.draw_squares()
         self.draw_buttons()
-        self.write_message()
+        if self.m:
+            self.write_message()
         pygame.display.update()
         if self.m == 'A palavra não está na lista de palavras!':
             pygame.time.wait(1000)
