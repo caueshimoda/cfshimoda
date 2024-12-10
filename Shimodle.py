@@ -1,6 +1,7 @@
 import pygame
 from random import randint
 from copy import deepcopy
+import sys
 
 # Inicialização de variáveis globais relacionadas à janela e gráficos
 w_width = 700
@@ -155,64 +156,6 @@ class Button:
         return False
 
 
-def redraw_window(window, board, buttons, message):
-    # Função que desenha a janela a cada frame
-    window.fill(BLACK)
-
-    def draw_squares():
-
-        x = round(w_width / 2) - round((5 * s_width + 4 * s_space) / 2)
-        y = 20
-
-        for i in range(tries):
-            for j in range(5):
-                color = BLACK
-                if len(board.player_word[i]) > j and len(board.player_word[i]) > 0:
-                    letter = board.player_word[i][j]
-                    if i == board.row:
-                        color = GRAY
-                else:
-                    letter = ''
-                if board.guess[i*5 + j] == 'WRONG POSITION':
-                    color = YELLOW
-                elif board.guess[i*5 + j] == 'CORRECT':
-                    color = GREEN
-                square = Square(color, letter, x, y)
-                square.draw(window)
-                if j < 4:
-                    x += s_width + s_space
-                else:
-                    x = round(w_width / 2) - round((5 * s_width + 4 * s_space) / 2)
-                    y += s_height + s_space
-
-    def draw_buttons():
-
-        for i in range(len(buttons)):
-            color = GRAY
-            if i < b_letters:
-                if buttons[i].text in board.gray_letters:
-                    color = DARKGRAY
-                elif buttons[i].text in board.green_letters:
-                    color = GREEN
-                elif buttons[i].text in board.yellow_letters:
-                    color = YELLOW
-
-            buttons[i].draw(color)
-
-    def write_message(mess):
-        font = pygame.font.SysFont(text_font, 30)
-        text = font.render(mess, 1, WHITE)
-        win.blit(text, (round(w_width / 2) - round(text.get_width() / 2), 370))
-
-    draw_squares()
-    draw_buttons()
-    write_message(message)
-    pygame.display.update()
-    if message == 'A palavra não está na lista de palavras!':
-        pygame.time.wait(1000)
-        pygame.display.update()
-
-
 class Game:
 
     def __init__(self):
@@ -290,6 +233,62 @@ class Game:
                     or ind == b_letters - 1):
                 jind += 1
 
+    def draw_squares(self):
+
+        x = round(w_width / 2) - round((5 * s_width + 4 * s_space) / 2)
+        y = 20
+
+        for i in range(tries):
+            for j in range(5):
+                color = BLACK
+                if len(self.b.player_word[i]) > j and len(self.b.player_word[i]) > 0:
+                    letter = self.b.player_word[i][j]
+                    if i == self.b.row:
+                        color = GRAY
+                else:
+                    letter = ''
+                if self.b.guess[i*5 + j] == 'WRONG POSITION':
+                    color = YELLOW
+                elif self.b.guess[i*5 + j] == 'CORRECT':
+                    color = GREEN
+                square = Square(color, letter, x, y)
+                square.draw(win)
+                if j < 4:
+                    x += s_width + s_space
+                else:
+                    x = round(w_width / 2) - round((5 * s_width + 4 * s_space) / 2)
+                    y += s_height + s_space
+
+    def draw_buttons(self):
+
+        for i in range(len(self.btns)):
+            color = GRAY
+            if i < b_letters:
+                if self.btns[i].text in self.b.gray_letters:
+                    color = DARKGRAY
+                elif self.btns[i].text in self.b.green_letters:
+                    color = GREEN
+                elif self.btns[i].text in self.b.yellow_letters:
+                    color = YELLOW
+
+            self.btns[i].draw(color)
+
+    def write_message(self):
+        font = pygame.font.SysFont(text_font, 30)
+        text = font.render(self.m, 1, WHITE)
+        win.blit(text, (round(w_width / 2) - round(text.get_width() / 2), 370))
+
+    def redraw_window(self):
+        # Função que desenha a janela a cada frame
+        win.fill(BLACK)
+        self.draw_squares()
+        self.draw_buttons()
+        self.write_message()
+        pygame.display.update()
+        if self.m == 'A palavra não está na lista de palavras!':
+            pygame.time.wait(1000)
+            pygame.display.update()
+
     def send_guess(self):
         if self.b.player_word[self.b.row] in words:
             used_copy = deepcopy(self.used)
@@ -325,6 +324,7 @@ class Game:
             if event.type == pygame.QUIT:
                 pygame.display.quit()
                 pygame.quit()
+                sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if not self.b.game_end:
                     pos = pygame.mouse.get_pos()
@@ -353,7 +353,7 @@ class Game:
                 else:
                     self.new_game()
 
-        redraw_window(win, self.b, self.btns, self.m)
+        self.redraw_window()
 
 
 game = Game()
